@@ -7,7 +7,7 @@ import ipaddress
 import re
 import platform
 
-_IFACE = re.compile(r"^[A-Za-z0-9_.:-]{1,15}$")
+_IFACE = re.compile(r"^[A-Za-z0-9_.: -]{1,64}$")
 MIN_MBPS = 1
 MAX_MBPS = 10
 

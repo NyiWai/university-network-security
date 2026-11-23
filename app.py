@@ -224,15 +224,34 @@ with pages[7]:
         upload_iface = st.selectbox("Upload egress interface (gateway WAN)", ifnames)
         download_iface = st.selectbox("Download egress interface (gateway LAN)", ifnames, index=min(1, len(ifnames)-1))
         consent = st.checkbox("I confirm this is my own isolated lab or a network I am explicitly authorized to manage.")
-        submitted = st.form_submit_button("Create bandwidth policy", disabled=not consent)
+        submitted = st.form_submit_button("Create bandwidth policy")
         if submitted:
-            try:
-                policy = validate_policy(target_ip, upload_iface, download_iface, limit_mbps, direction)
-                policy_id = create_bandwidth_policy(policy)
-                st.success(f"Policy #{policy_id} created with PENDING status. No traffic has been changed.")
-                st.rerun()
-            except ValueError as exc:
-                st.error(str(exc))
+            if not consent:
+                st.error(
+                    "Please confirm that this is your own "
+                    "isolated lab or an authorized network."
+                )
+            else:
+                try:
+                    policy = validate_policy(
+                        target_ip,
+                        upload_iface,
+                        download_iface,
+                        limit_mbps,
+                        direction
+                    )
+
+                    policy_id = create_bandwidth_policy(policy)
+
+                    st.success(
+                        f"Policy #{policy_id} created with PENDING status. "
+                        "No traffic has been changed."
+                    )
+
+                    st.rerun()
+
+                except ValueError as exc:
+                    st.error(str(exc))
 
     st.subheader("Policy approval and lifecycle")
     policies = get_bandwidth_policies()
